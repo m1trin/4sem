@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">Данные формы</h1>
+        
+        {% if form %}
+        <div class="alert alert-info" role="alert">
+            <strong>Источник данных:</strong> Автоматически заполнено из данных авторизации (cookie).
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Данные из авторизации</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Поле формы</th>
+                            <th>Значение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in form.items() %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            <strong>Нет данных!</strong> Сначала <a href="{{ url_for('index') }}" class="alert-link">авторизуйтесь</a>, чтобы увидеть данные формы.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+

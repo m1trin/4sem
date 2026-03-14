@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Параметры URL</h1>
+        
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">GET параметры запроса</h5>
+            </div>
+            <div class="card-body">
+                {% if url %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Значение</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in url.items() %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>Текущий URL:</strong> {{ request.url }}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Нет параметров URL</p>
+                    <p class="text-muted">Пример: <a href="{{ url_for('url') }}?name=John&age=25&city=Moscow">{{ url_for('url') }}?name=John&age=25&city=Moscow</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="my-5">{{ post.title }}</h1>
+        
+        <div class="mb-3 text-muted">
+            <span>Автор: {{ post.author }}</span>
+            <span class="ms-3">Опубликовано: {{ post.date.strftime('%d.%m.%Y %H:%M') }}</span>
+        </div>
+        
+        <img class="img-fluid mb-4" src="{{ url_for('static', filename='images/' + post.image_id) }}" alt="Post image">
+        
+        <div class="post-text mb-5">
+            {{ post.text | safe }}
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Оставьте комментарий</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="3" placeholder="Ваш комментарий..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="comments-section">
+            <h4 class="mb-4">Комментарии ({{ post.comments | length }})</h4>
+            
+            {% for comment in post.comments %}
+                <div class="media mb-4">
+                    <div class="media-body">
+                        <img src="{{ url_for('static', filename='images/avatar.jpg') }}"
+                        class="rounded-circle"
+                        width="48" height="48"
+                         alt="{{ comment.author }}">
+                        <h5 class="mt-0">{{ comment.author }}</h5>
+                        <p>{{ comment.text }}</p>
+                        
+                        {% if comment.replies %}
+                            <div class="replies mt-3 ms-4">
+                                {% for reply in comment.replies %}
+                                    <div class="media mb-3">
+                                        <div class="media-body">
+                                            <img src="{{ url_for('static', filename='images/avatar.jpg') }}"
+                                            class="rounded-circle"
+                                            width="48" height="48"
+                                            alt="{{ reply.author }}">
+                                            <h5 class="mt-0">{{ reply.author }}</h5>
+                                            <p>{{ reply.text }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
