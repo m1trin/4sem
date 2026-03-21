@@ -1,0 +1,43 @@
+{% macro render_field(field, label, required=false) %}
+<div style="margin-bottom: 15px;">
+    <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+        {{ label }}{% if required %} <span style="color: #e74c3c;">*</span>{% endif %}
+    </label>
+    
+    {% set field_class = "form-control" %}
+    {% if field.errors %}
+        {% set field_class = field_class + " error" %}
+    {% endif %}
+    
+    {{ field(class=field_class, style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;") }}
+    
+    {% if field.errors %}
+        <div class="error-message" style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+            {% for error in field.errors %}
+                {{ error }}{% if not loop.last %}; {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_select(field, label) %}
+<div style="margin-bottom: 15px;">
+    <label style="display: block; margin-bottom: 5px; font-weight: bold;">{{ label }}</label>
+    
+    {% set field_class = "form-control" %}
+    {% if field.errors %}
+        {% set field_class = field_class + " error" %}
+    {% endif %}
+    
+    {{ field(class=field_class, style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;") }}
+    
+    {% if field.errors %}
+        <div class="error-message" style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+            {% for error in field.errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
