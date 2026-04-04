@@ -1,3 +1,8 @@
 ve/
 __pycache__
 app/__pycache__
+lab_6/requirements.txt
+lab_6/app/.env
+lab_6/app/migrations/__pycache__
+lab_6/app/app.db
+lab_6/app/migrations/versions/

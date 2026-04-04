@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h1 style="margin-bottom: 20px;">Отчёт по пользователям</h1>
+    
+    <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <thead>
+            <tr style="background: #34495e; color: white;">
+                <th style="padding: 12px; text-align: left;">№</th>
+                <th style="padding: 12px; text-align: left;">Пользователь</th>
+                <th style="padding: 12px; text-align: left;">Количество посещений</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in stats %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px;">{{ loop.index }}</td>
+                <td style="padding: 12px;">
+                    {% if stat.user_id %}
+                        {{ stat.last_name }} {{ stat.first_name }} {{ stat.middle_name }}
+                    {% else %}
+                        Неаутентифицированный пользователь
+                    {% endif %}
+                </td>
+                <td style="padding: 12px;">{{ stat.count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('reports.export_users_report') }}" style="background: #2ecc71; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block;">Экспорт в CSV</a>
+        <a href="{{ url_for('reports.index') }}" style="background: #95a5a6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin-left: 10px;">Назад</a>
+    </div>
+</div>
+{% endblock %}

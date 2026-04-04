@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <h1 style="margin-bottom: 20px;">Журнал посещений</h1>
+    
+    <!-- Ссылки на отчёты (только для админа) -->
+    
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('reports.pages_report') }}" style="margin-right: 15px;">Отчёт по страницам</a>
+        <a href="{{ url_for('reports.users_report') }}">Отчёт по пользователям</a>
+    </div>
+
+    
+    <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <thead>
+            <tr style="background: #34495e; color: white;">
+                <th style="padding: 12px;">№</th>
+                <th style="padding: 12px;">Пользователь</th>
+                <th style="padding: 12px;">Страница</th>
+                <th style="padding: 12px;">Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px;">{{ loop.index + (pagination.page - 1) * pagination.per_page }}</td>
+                <td style="padding: 12px;">
+                    {% if log.user %}
+                        {{ log.user.full_name() }}
+                    {% else %}
+                        Неаутентифицированный пользователь
+                    {% endif %}
+                </td>
+                <td style="padding: 12px;">{{ log.path }}</td>
+                <td style="padding: 12px;">{{ log.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Пагинация -->
+    <div style="margin-top: 20px; text-align: center;">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('reports.index', page=pagination.prev_num) }}" style="margin-right: 10px;">← Назад</a>
+        {% endif %}
+        <span>Страница {{ pagination.page }} из {{ pagination.pages }}</span>
+        {% if pagination.has_next %}
+        <a href="{{ url_for('reports.index', page=pagination.next_num) }}" style="margin-left: 10px;">Вперёд →</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

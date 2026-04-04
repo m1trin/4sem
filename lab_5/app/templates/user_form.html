@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="margin-bottom: 20px;">{% if is_edit %}Редактирование{% else %}Создание{% endif %} пользователя</h1>
+    
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <form method="POST">
+            {% if not is_edit %}
+                {{ render_field(form.login, 'Логин', required=true) }}
+                {{ render_field(form.password, 'Пароль', required=true) }}
+            {% endif %}
+            
+            {{ render_field(form.last_name, 'Фамилия') }}
+            {{ render_field(form.first_name, 'Имя', required=true) }}
+            {{ render_field(form.middle_name, 'Отчество') }}
+            
+            {% if current_user.is_authenticated and current_user.role and current_user.role.name == 'Администратор' %}
+                {{ render_field(form.role_id, 'Роль') }}
+            {% endif %}
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Сохранить</button>
+                <a href="{{ url_for('main.index') }}" style="padding: 10px 20px; background: #95a5a6; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
