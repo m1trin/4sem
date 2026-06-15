@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Модерация рецензий — Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <h1 class="page-title mb-4">
+        <i class="fa-solid fa-gavel me-2 text-indigo"></i>
+        Модерация рецензий
+    </h1>
+    <hr class="border-secondary mb-4">
+    
+    {% if reviews %}
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>Книга</th>
+                        <th>Пользователь</th>
+                        <th>Дата добавления</th>
+                        <th>Оценка</th>
+                        <th class="text-end">Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('book_detail', book_id=review.book.id) }}" class="text-light font-weight-bold text-decoration-none" target="_blank">
+                                    {{ review.book.title }}
+                                </a>
+                                <div class="text-muted small">Автор: {{ review.book.author }}</div>
+                            </td>
+                            <td>
+                                <span class="text-indigo"><i class="fa-solid fa-user me-1"></i>{{ review.user.full_name }}</span>
+                                <div class="text-muted small">Логин: {{ review.user.login }}</div>
+                            </td>
+                            <td class="text-muted small">
+                                <i class="fa-solid fa-clock me-1"></i>{{ review.date_added.strftime('%d.%m.%Y %H:%M') }}
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fa-solid fa-star me-1"></i>{{ review.rating }}/5
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('moderate_review', review_id=review.id) }}" class="btn btn-indigo btn-sm px-3">
+                                    <i class="fa-solid fa-search me-1"></i> Рассмотреть
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if pagination and pagination.pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('moderation', page=pagination.prev_num) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('moderation', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('moderation', page=pagination.next_num) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fa-solid fa-circle-check fs-1 text-success mb-3"></i>
+            <h3>Нет рецензий для рассмотрения</h3>
+            <p class="mb-0">Все рецензии обработаны. Отличная работа!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

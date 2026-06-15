@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} — Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="glass-panel mb-5">
+    <div class="row">
+        <!-- Book Cover -->
+        <div class="col-md-4 text-center mb-4 mb-md-0">
+            {% if book.covers %}
+                <img src="{{ url_for('static', filename='covers/' + book.covers[0].file_name) }}" class="book-detail-cover img-fluid" alt="{{ book.title }}">
+            {% else %}
+                <div class="book-cover-placeholder d-flex align-items-center justify-content-center border border-secondary rounded" style="height: 400px; background: rgba(255,255,255,0.02)">
+                    <i class="fa-solid fa-book fs-1"></i>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Book Specs & Description -->
+        <div class="col-md-8">
+            <h1 class="page-title text-indigo mb-2">{{ book.title }}</h1>
+            <h4 class="text-muted mb-4"><i class="fa-solid fa-user-pen me-2"></i>{{ book.author }}</h4>
+            
+            <div class="row mb-4">
+                <div class="col-sm-6 mb-2">
+                    <span class="detail-label">Издательство:</span>
+                    <span class="detail-value ms-1">{{ book.publisher }}</span>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="detail-label">Год издания:</span>
+                    <span class="detail-value ms-1">{{ book.year }}</span>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="detail-label">Количество страниц:</span>
+                    <span class="detail-value ms-1">{{ book.page_count }}</span>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="detail-label">Жанры:</span>
+                    <span class="ms-1">
+                        {% for genre in book.genres %}
+                            <span class="genre-tag">{{ genre.name }}</span>
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+            
+            <hr class="border-secondary my-4">
+            
+            <h5 class="text-light mb-3">Описание книги</h5>
+            <div class="book-description text-muted">
+                {{ book.short_description | markdown | safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reviews Section -->
+<div class="row">
+    <!-- Reviews List -->
+    <div class="col-lg-7 mb-4">
+        <div class="glass-panel">
+            <h3 class="mb-4 text-light">
+                <i class="fa-solid fa-comments text-indigo me-2"></i>Рецензии читателей
+            </h3>
+            
+            {% set approved_reviews = [] %}
+            {% for r in book.reviews %}
+                {% if r.status_id == 2 %}
+                    {% set _ = approved_reviews.append(r) %}
+                {% endif %}
+            {% endfor %}
+            
+            {% if approved_reviews %}
+                {% for review in approved_reviews %}
+                    <div class="review-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="text-indigo mb-0 font-weight-bold">
+                                <i class="fa-solid fa-circle-user me-1"></i>{{ review.user.full_name }}
+                            </h6>
+                            <span class="badge bg-warning text-dark">
+                                <i class="fa-solid fa-star me-1"></i>{{ review.rating }}/5
+                            </span>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            <i class="fa-solid fa-calendar-day me-1"></i>{{ review.date_added.strftime('%d.%m.%Y %H:%M') }}
+                        </div>
+                        <div class="review-text text-light">
+                            {{ review.text | markdown | safe }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-comment-slash fs-2 mb-3"></i>
+                    <p class="mb-0">На эту книгу пока нет одобренных рецензий.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Review Form / User Review Details -->
+    <div class="col-lg-5">
+        <div class="glass-panel">
+            {% if current_user.is_authenticated %}
+                {% if user_review %}
+                    <!-- User already wrote a review -->
+                    <h4 class="text-light mb-3"><i class="fa-solid fa-check-circle text-success me-2"></i>Ваша рецензия</h4>
+                    <p class="text-muted">Вы уже написали рецензию на эту книгу.</p>
+                    
+                    <div class="review-item border-success">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="status-badge 
+                                {% if user_review.status_id == 1 %}status-pending
+                                {% elif user_review.status_id == 2 %}status-approved
+                                {% else %}status-rejected{% endif %}">
+                                <i class="fa-solid {% if user_review.status_id == 1 %}fa-clock{% elif user_review.status_id == 2 %}fa-check{% else %}fa-times{% endif %} me-1"></i>
+                                {{ user_review.status.name }}
+                            </span>
+                            <span class="badge bg-warning text-dark">
+                                <i class="fa-solid fa-star me-1"></i>{{ user_review.rating }}/5
+                            </span>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            <i class="fa-solid fa-calendar-day me-1"></i>{{ user_review.date_added.strftime('%d.%m.%Y %H:%M') }}
+                        </div>
+                        <div class="review-text text-light">
+                            {{ user_review.text | markdown | safe }}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Review Form -->
+                    <h4 class="text-light mb-3"><i class="fa-solid fa-pen-nib text-indigo me-2"></i>Написать рецензию</h4>
+                    <hr class="border-secondary mb-3">
+                    
+                    <form method="POST" action="{{ url_for('add_review', book_id=book.id) }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Оценка <span class="text-danger">*</span></label>
+                            <select class="form-select" id="rating" name="rating" required>
+                                <option value="" disabled selected>Выберите оценку...</option>
+                                <option value="5">5 — Отлично</option>
+                                <option value="4">4 — Хорошо</option>
+                                <option value="3">3 — Удовлетворительно</option>
+                                <option value="2">2 — Неудовлетворительно</option>
+                                <option value="1">1 — Плохо</option>
+                                <option value="0">0 — Ужасно</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="review_text" class="form-label">Текст рецензии <span class="text-danger">*</span></label>
+                            <textarea class="form-control easymde-editor" id="review_text" name="text" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-indigo w-100 py-2">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Отправить на модерацию
+                        </button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <!-- Prompt login to write a review -->
+                <div class="text-center py-4">
+                    <i class="fa-solid fa-user-lock fs-2 text-muted mb-3"></i>
+                    <h5 class="text-muted">Хотите написать рецензию?</h5>
+                    <p class="text-muted small mb-4">Для написания рецензии необходимо авторизоваться в системе.</p>
+                    <a href="{{ url_for('login', next=request.path) }}" class="btn btn-indigo px-4">
+                        <i class="fa-solid fa-sign-in-alt me-1"></i> Войти
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

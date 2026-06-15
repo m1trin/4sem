@@ -1,0 +1,69 @@
+{% macro render_book_form(book=None, genres_list=[], is_edit=False) %}
+<form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="title" class="form-label">Название книги <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ book.title if book else request.form.get('title', '') }}" required>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="author" class="form-label">Автор <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="author" name="author" value="{{ book.author if book else request.form.get('author', '') }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="publisher" class="form-label">Издательство <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="publisher" name="publisher" value="{{ book.publisher if book else request.form.get('publisher', '') }}" required>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="year" class="form-label">Год издания <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="year" name="year" value="{{ book.year if book else request.form.get('year', '') }}" min="1000" max="2100" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="page_count" class="form-label">Количество страниц <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="page_count" name="page_count" value="{{ book.page_count if book else request.form.get('page_count', '') }}" min="1" required>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="genres" class="form-label">Жанры <span class="text-danger">*</span></label>
+        <select class="form-select" id="genres" name="genres" multiple required size="5">
+            {% for genre in genres_list %}
+                {% set is_selected = False %}
+                {% if book %}
+                    {% if genre in book.genres %}
+                        {% set is_selected = True %}
+                    {% endif %}
+                {% else %}
+                    {% if genre.id|string in request.form.getlist('genres') %}
+                        {% set is_selected = True %}
+                    {% endif %}
+                {% endif %}
+                <option value="{{ genre.id }}" {% if is_selected %}selected{% endif %}>{{ genre.name }}</option>
+            {% endfor %}
+        </select>
+        <div class="form-text text-muted">Удерживайте Ctrl (или Cmd на Mac) для выбора нескольких жанров.</div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="short_description" class="form-label">Краткое описание <span class="text-danger">*</span></label>
+        <textarea class="form-control easymde-editor" id="short_description" name="short_description">{{ book.short_description if book else request.form.get('short_description', '') }}</textarea>
+    </div>
+    
+    {% if not is_edit %}
+    <div class="mb-4">
+        <label for="cover" class="form-label">Обложка книги <span class="text-danger">*</span></label>
+        <input type="file" class="form-control" id="cover" name="cover" accept="image/*" required>
+    </div>
+    {% endif %}
+    
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-indigo px-4">
+            <i class="fa-solid fa-save me-1"></i> Сохранить
+        </button>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary px-4">Отмена</a>
+    </div>
+</form>
+{% endmacro %}

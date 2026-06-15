@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Электронная библиотека{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- EasyMDE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Glassmorphic Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+        <div class="container">
+            <a class="navbar-brand logo-glow" href="{{ url_for('index') }}">
+                <i class="fa-solid fa-book-open-reader me-2 text-indigo"></i>
+                <span>Электронная библиотека</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' or request.path == '/books' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <i class="fa-solid fa-house me-1"></i> Главная
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_user() %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/my_reviews' %}active{% endif %}" href="{{ url_for('my_reviews') }}">
+                                <i class="fa-solid fa-star-half-stroke me-1"></i> Мои рецензии
+                            </a>
+                        </li>
+                        {% elif current_user.is_moderator() %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/moderation' %}active{% endif %}" href="{{ url_for('moderation') }}">
+                                <i class="fa-solid fa-gavel me-1"></i> Модерация рецензий
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center">
+                    {% if current_user.is_authenticated %}
+                        <span class="text-light me-3 user-info-badge">
+                            <i class="fa-solid fa-user-circle me-1"></i>
+                            {{ current_user.full_name }}
+                            <span class="badge bg-indigo ms-1">
+                                {% if current_user.is_admin() %}Администратор
+                                {% elif current_user.is_moderator() %}Модератор
+                                {% else %}Пользователь
+                                {% endif %}
+                            </span>
+                        </span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-logout btn-sm">
+                            <i class="fa-solid fa-sign-out-alt me-1"></i> Выйти
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-indigo btn-sm px-4">
+                            <i class="fa-solid fa-sign-in-alt me-1"></i> Войти
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="container my-5 flex-grow-1">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' or category == 'danger' else 'success' if category == 'success' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show custom-alert" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid {% if category == 'error' or category == 'danger' %}fa-circle-exclamation{% elif category == 'success' %}fa-circle-check{% else %}fa-circle-info{% endif %} me-2 fs-5"></i>
+                                <div>{{ message }}</div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Custom Footer -->
+    <footer class="custom-footer py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-1 text-muted">© 2026 АИС «Электронная библиотека». Все права защищены.</p>
+            <p class="mb-0 text-indigo font-weight-bold">Группа 241-327, Хилов Дмитрий Алексеевич</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- EasyMDE JS -->
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои рецензии — Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="glass-panel">
+    <h1 class="page-title mb-4">
+        <i class="fa-solid fa-star-half-stroke me-2 text-indigo"></i>
+        Мои рецензии
+    </h1>
+    <hr class="border-secondary mb-4">
+    
+    {% if reviews %}
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Книга</th>
+                        <th style="width: 10%;">Оценка</th>
+                        <th style="width: 35%;">Текст рецензии</th>
+                        <th style="width: 15%;">Дата добавления</th>
+                        <th style="width: 15%;">Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('book_detail', book_id=review.book.id) }}" class="text-indigo font-weight-bold text-decoration-none">
+                                    {{ review.book.title }}
+                                </a>
+                                <div class="text-muted small">Автор: {{ review.book.author }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fa-solid fa-star me-1"></i>{{ review.rating }}/5
+                                </span>
+                            </td>
+                            <td>
+                                <div class="review-text-preview text-light" style="max-height: 80px; overflow-y: auto;">
+                                    {{ review.text | markdown | safe }}
+                                </div>
+                            </td>
+                            <td class="text-muted small">
+                                {{ review.date_added.strftime('%d.%m.%Y %H:%M') }}
+                            </td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if review.status_id == 1 %}status-pending
+                                    {% elif review.status_id == 2 %}status-approved
+                                    {% else %}status-rejected{% endif %}">
+                                    <i class="fa-solid {% if review.status_id == 1 %}fa-clock{% elif review.status_id == 2 %}fa-check{% else %}fa-times{% endif %} me-1"></i>
+                                    {{ review.status.name }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fa-solid fa-comment-slash fs-1 mb-3"></i>
+            <h3>Вы еще не писали рецензий</h3>
+            <p class="mb-0">Найдите интересную книгу в каталоге и поделитесь своим мнением!</p>
+            <a href="{{ url_for('index') }}" class="btn btn-indigo mt-3">Перейти в каталог</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

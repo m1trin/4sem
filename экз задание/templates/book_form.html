@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from '_form.html' import render_book_form %}
+
+{% block title %}
+    {% if is_edit %}Редактирование книги{% else %}Добавление книги{% endif %} — Электронная библиотека
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="glass-panel">
+            <h1 class="page-title">
+                <i class="fa-solid {% if is_edit %}fa-edit{% else %}fa-plus-circle{% endif %} me-2 text-indigo"></i>
+                {% if is_edit %}Редактирование книги{% else %}Добавление новой книги{% endif %}
+            </h1>
+            <hr class="border-secondary mb-4">
+            
+            {{ render_book_form(book=book, genres_list=genres_list, is_edit=is_edit) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
